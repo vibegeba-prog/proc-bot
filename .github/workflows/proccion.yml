@@ -7,10 +7,19 @@ on:
     # Вечер 20:30 МСК (17:30 UTC) по будням: пн-пт
     - cron: '30 17 * * 1-5'
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Режим запуска'
+        required: true
+        default: 'morning'
+        type: choice
+        options:
+          - morning
+          - evening
 
 jobs:
   morning:
-    if: github.event.schedule == '45 5 * * 1-5' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '45 5 * * 1-5' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'morning')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +34,7 @@ jobs:
           OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
 
   evening:
-    if: github.event.schedule == '30 17 * * 1-5' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '30 17 * * 1-5' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'evening')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
